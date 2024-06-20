@@ -9,7 +9,8 @@ export default function Command() {
   useEffect(() => {
     (async () => {
       const savedWaterIntake = await LocalStorage.getItem<number>("waterIntake");
-      if (savedWaterIntake !== undefined) {
+      if (savedWaterIntake !== undefined && savedWaterIntake != 0) {
+        console.log(`loaded saved water intake ${savedWaterIntake}`);
         setWaterIntake(savedWaterIntake);
       }
     })();
@@ -18,6 +19,7 @@ export default function Command() {
   // 在喝水量变化时保存数据
   useEffect(() => {
     LocalStorage.setItem("waterIntake", waterIntake);
+    console.log(`save water intake ${waterIntake}`);
   }, [waterIntake]);
 
   useEffect(() => {
