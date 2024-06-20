@@ -1,4 +1,4 @@
-import { ActionPanel, List, showToast, Toast, LocalStorage } from '@raycast/api';
+import { ActionPanel, List, showToast, Toast, LocalStorage, Detail} from '@raycast/api';
 import { useEffect, useState } from 'react';
 
 export default function Command() {
@@ -24,6 +24,14 @@ export default function Command() {
     })();
   }, []);
 
+  const drinkWater = (amount: number) => {
+    if (waterIntake !== null) {
+      const newIntake = waterIntake + amount;
+      setWaterIntake(newIntake);
+      showToast(Toast.Style.Success, "咕噜咕噜!", `又喝了 ${amount} 毫升水`);
+    }
+  }
+
   // 在喝水量变化时保存数据
   useEffect(() => {
     if (waterIntake == null) {
@@ -35,11 +43,16 @@ export default function Command() {
 
   useEffect(() => {
     showToast({
-      style: Toast.Style.Animated,
+      style: Toast.Style.Success,
       title: "喝水提醒",
-      message: "请记得喝水！",
+      message: "🔔 请记得喝水！",
     });
   }, []);
+
+  // 如果 waterIntake 仍然是 null，则显示加载状态
+  if (waterIntake === null) {
+    return <Detail markdown="加载中..." />;
+  }
 
   return (
     <List>
@@ -57,11 +70,11 @@ export default function Command() {
           <ActionPanel>
             <ActionPanel.Item
               title="添加 250 毫升"
-              onAction={() => setWaterIntake(waterIntake + 250)}
+              onAction={() => drinkWater(250)}
             />
             <ActionPanel.Item
               title="添加 500 毫升"
-              onAction={() => setWaterIntake(waterIntake + 500)}
+              onAction={() => drinkWater(500)}
             />
           </ActionPanel>
         }
