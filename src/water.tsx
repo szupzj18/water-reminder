@@ -2,18 +2,36 @@ import { ActionPanel, List, showToast, Toast, LocalStorage } from '@raycast/api'
 import { useEffect, useState } from 'react';
 
 export default function Command() {
+
+    // 从 LocalStorage 获取初始值
+  const getInitialWaterIntake = async () => {
+    try {
+      const savedWaterIntake = await LocalStorage.getItem<number>("waterIntake");
+      console.log(`saved water intake = ${savedWaterIntake}`);
+      return savedWaterIntake !== undefined ? savedWaterIntake : 0;
+    } catch (error) {
+      console.error("Failed to load water intake:", error);
+      return 0;
+    }
+  };
+
   const [waterGoal, setWaterGoal] = useState(2000); // 每日喝水目标（毫升）
-  const [waterIntake, setWaterIntake] = useState(0); // 当前喝水量（毫升）
+  const [waterIntake, setWaterIntake] = useState(0); // 当前已喝水量（毫升)
 
   // 加载持久化的数据
+  // 加载初始喝水量
   useEffect(() => {
+    let mounted = true;
     (async () => {
-      const savedWaterIntake = await LocalStorage.getItem<number>("waterIntake");
-      if (savedWaterIntake !== undefined && savedWaterIntake != 0) {
-        console.log(`loaded saved water intake ${savedWaterIntake}`);
-        setWaterIntake(savedWaterIntake);
-      }
+        const initialWaterIntake = await getInitialWaterIntake();
+        if (mounted) {
+            setWaterIntake(initialWaterIntake);
+            console.log(`Initial water intake: ${initialWaterIntake}`);
+        }
     })();
+    return () => {
+        mounted = false;
+    }
   }, []);
 
   // 在喝水量变化时保存数据
