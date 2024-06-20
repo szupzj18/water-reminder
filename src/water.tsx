@@ -1,9 +1,24 @@
-import { ActionPanel, List, showToast, Toast } from '@raycast/api';
+import { ActionPanel, List, showToast, Toast, LocalStorage } from '@raycast/api';
 import { useEffect, useState } from 'react';
 
 export default function Command() {
   const [waterGoal, setWaterGoal] = useState(2000); // 每日喝水目标（毫升）
   const [waterIntake, setWaterIntake] = useState(0); // 当前喝水量（毫升）
+
+  // 加载持久化的数据
+  useEffect(() => {
+    (async () => {
+      const savedWaterIntake = await LocalStorage.getItem<number>("waterIntake");
+      if (savedWaterIntake !== undefined) {
+        setWaterIntake(savedWaterIntake);
+      }
+    })();
+  }, []);
+
+  // 在喝水量变化时保存数据
+  useEffect(() => {
+    LocalStorage.setItem("waterIntake", waterIntake);
+  }, [waterIntake]);
 
   useEffect(() => {
     showToast({
